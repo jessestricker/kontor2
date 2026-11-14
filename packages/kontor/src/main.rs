@@ -9,6 +9,7 @@ use crate::kontor::Kontor;
 
 mod kontor;
 mod nix;
+mod sys;
 
 /// Manage your home directory and environment.
 #[derive(Parser, Debug)]
