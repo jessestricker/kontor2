@@ -5,12 +5,19 @@ let
   kontor = pkgs.callPackage ./packages/kontor { };
 in
 rec {
-  inherit kontor;
-
-  nixpkgs = pkgs;
+  inherit kontor pkgs;
 
   user-env = pkgs.buildEnv {
     name = "user-env";
-    paths = [ kontor ];
+    paths =
+      (with pkgs; [
+        git
+        nixd
+        nixfmt
+        npins
+        shellcheck
+        shfmt
+      ])
+      ++ [ kontor ];
   };
 }
