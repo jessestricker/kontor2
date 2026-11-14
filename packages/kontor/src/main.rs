@@ -24,9 +24,11 @@ enum Command {
 }
 
 fn main() -> impl Termination {
-    env_logger::builder()
+    env_logger::Builder::new()
+        .filter_level(log::LevelFilter::Info)
+        .parse_default_env()
         .format(|buf, record| {
-            let style = buf.default_level_style(record.level());
+            let style = buf.default_level_style(record.level()).bold();
             writeln!(
                 buf,
                 "(kontor) {style}{}:{style:#} {}",
