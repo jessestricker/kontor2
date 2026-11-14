@@ -12,6 +12,7 @@ rec {
     paths =
       (with pkgs; [
         git
+        micro
         nixd
         nixfmt
         npins
