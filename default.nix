@@ -7,8 +7,9 @@ in
 rec {
   inherit kontor pkgs;
 
+  # The user environment.
   user-env = pkgs.buildEnv {
-    name = "user-env";
+    name = "kontor-user-env";
     paths =
       (with pkgs; [
         git
