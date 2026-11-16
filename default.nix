@@ -3,9 +3,6 @@ let
   pkgs = import sources.nixpkgs { };
 
   kontor = pkgs.callPackage ./packages/kontor { };
-in
-rec {
-  inherit kontor pkgs;
 
   # The user environment.
   user-env = pkgs.buildEnv {
@@ -21,5 +18,20 @@ rec {
         shfmt
       ])
       ++ [ kontor ];
+  };
+
+  # The Nix channels.
+  channels = pkgs.linkFarm "kontor-channels" {
+    inherit (sources)
+      nixpkgs
+      ;
+  };
+in
+{
+  inherit kontor pkgs;
+
+  # The Kontor configuration.
+  config = pkgs.linkFarm "kontor-config" {
+    inherit user-env channels;
   };
 }

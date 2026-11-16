@@ -1,65 +1,67 @@
-use std::{env, fs, path::PathBuf};
+use std::{env, os::unix::fs::symlink, path::PathBuf};
 
 use anyhow::{Context, Error, anyhow};
 use log::info;
 
 use crate::{
     nix::{NixBuild, NixEnvSet, NixEnvSwitchProfile},
-    sys::xdg_state_home,
+    sys::{ensure_parent_exists, xdg_state_home},
 };
 
 #[derive(Debug)]
 pub struct Kontor {
-    /// The directory which contains the kontor configuration.
-    kontor_dir: PathBuf,
-
-    /// The kontor Nix profile directory.
-    kontor_profile_dir: PathBuf,
+    home_dir: PathBuf,
+    /// The directory containing the configuration.
+    config_dir: PathBuf,
+    /// The Nix profile containing the built configuration.
+    profile_dir: PathBuf,
 }
 
 impl Kontor {
-    const KONTOR_DIR_NAME: &str = "kontor";
-    const USER_ENV_ATTR: &str = "user-env";
-    const KONTOR_PROFILE_PATH: &str = "kontor/profile";
-
     pub fn new() -> Self {
         let home_dir = env::home_dir().expect("current user should have a home dir");
-        let kontor_dir = home_dir.join(Self::KONTOR_DIR_NAME);
-        let kontor_profile_dir = xdg_state_home(&home_dir).join(Self::KONTOR_PROFILE_PATH);
+
+        let config_dir = home_dir.join("kontor");
+        let profile_dir = xdg_state_home(&home_dir).join("kontor/profile");
 
         Self {
-            kontor_dir,
-            kontor_profile_dir,
+            home_dir,
+            config_dir,
+            profile_dir,
         }
     }
 
     pub fn switch(&self) -> Result<(), Error> {
         let temp_dir = tempfile::tempdir()?;
-        let user_env_result_link = temp_dir.path().join("result");
+        let config_result_link = temp_dir.path().join("config-result");
 
-        // 1. Build the user environment derivation.
-        info!("building user environment");
+        // 1. Build the configuration derivation.
+        info!("building configuration");
         NixBuild::new()
-            .path(&self.kontor_dir)
-            .attr(Self::USER_ENV_ATTR.as_ref())
-            .out_link(&user_env_result_link)
+            .path(&self.config_dir)
+            .attr("config".as_ref())
+            .out_link(&config_result_link)
             .execute()
-            .context(anyhow!("failed to build user environment"))?;
+            .context(anyhow!("failed to build configuration"))?;
 
-        // 2. set kontor profile to contain user environment derivation
+        // 2. Set Kontor profile to contain built configuration.
         info!("setting kontor profile");
-        fs::create_dir_all(
-            self.kontor_profile_dir
-                .parent()
-                .expect("kontor profile directory should have a parent"),
-        )?;
-        NixEnvSet::new(user_env_result_link.as_ref())
-            .profile(&self.kontor_profile_dir)
+        ensure_parent_exists(&self.profile_dir)?;
+        NixEnvSet::new(config_result_link.as_ref())
+            .profile(&self.profile_dir)
             .execute()?;
 
-        // 3. switch Nix's user profile link to the kontor profile
+        // 3. Switch Nix's user profile link.
         info!("switching user profile link");
-        NixEnvSwitchProfile::new(&self.kontor_profile_dir).execute()?;
+        NixEnvSwitchProfile::new(&self.profile_dir.join("user-env")).execute()?;
+
+        // 4. Switch Nix's user channel link.
+        info!("switching user channel link");
+        let user_channel_link = self.home_dir.join(".nix-defexpr/channels");
+        ensure_parent_exists(&user_channel_link).context(anyhow!(
+            "failed to create parent directory of user channel link"
+        ))?;
+        symlink(self.profile_dir.join("channels"), user_channel_link)?;
 
         Ok(())
     }

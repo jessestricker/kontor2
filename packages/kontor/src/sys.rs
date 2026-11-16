@@ -1,5 +1,6 @@
 use std::{
-    env,
+    env, fs,
+    io::ErrorKind,
     path::{Path, PathBuf},
 };
 
@@ -16,4 +17,14 @@ pub fn xdg_state_home(home_dir: &Path) -> PathBuf {
             }
         })
         .unwrap_or_else(|| home_dir.join(".local/state"))
+}
+
+pub fn ensure_parent_exists(path: &Path) -> Result<(), std::io::Error> {
+    let Some(parent) = path.parent() else {
+        return Ok(());
+    };
+    match fs::create_dir_all(parent) {
+        Err(err) if err.kind() == ErrorKind::AlreadyExists => Ok(()),
+        res => res,
+    }
 }
