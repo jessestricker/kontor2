@@ -4,6 +4,8 @@ use std::{
     path::{Path, PathBuf},
 };
 
+use anyhow::{Context, Error, anyhow};
+
 /// Returns the base directory for user-specific state.
 ///
 /// See https://specifications.freedesktop.org/basedir/0.8/.
@@ -27,4 +29,19 @@ pub fn ensure_parent_exists(path: &Path) -> Result<(), std::io::Error> {
         Err(err) if err.kind() == ErrorKind::AlreadyExists => Ok(()),
         res => res,
     }
+}
+
+pub fn ensure_symlink(target: &Path, link: &Path) -> Result<(), Error> {
+    let result = std::os::unix::fs::symlink(target, link);
+    if let Err(ref err) = result
+        && err.kind() == ErrorKind::AlreadyExists
+    {
+        let actual_target = link
+            .read_link()
+            .with_context(|| anyhow!("failed to read link"))?;
+        if target != actual_target {
+            return result.with_context(|| anyhow!("link already exists with a different target"));
+        }
+    }
+    Ok(())
 }

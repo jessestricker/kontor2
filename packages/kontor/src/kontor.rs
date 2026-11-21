@@ -1,11 +1,11 @@
-use std::{env, os::unix::fs::symlink, path::PathBuf};
+use std::{env, path::PathBuf};
 
 use anyhow::{Context, Error, anyhow};
 use log::info;
 
 use crate::{
     nix::{NixBuild, NixEnvSet, NixEnvSwitchProfile},
-    sys::{ensure_parent_exists, xdg_state_home},
+    sys::{ensure_parent_exists, ensure_symlink, xdg_state_home},
 };
 
 #[derive(Debug)]
@@ -61,7 +61,7 @@ impl Kontor {
         ensure_parent_exists(&user_channel_link).context(anyhow!(
             "failed to create parent directory of user channel link"
         ))?;
-        symlink(self.profile_dir.join("channels"), user_channel_link)?;
+        ensure_symlink(&self.profile_dir.join("channels"), &user_channel_link)?;
 
         Ok(())
     }
