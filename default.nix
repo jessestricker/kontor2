@@ -2,7 +2,8 @@ let
   sources = import ./npins;
   pkgs = import sources.nixpkgs { };
 
-  kontor = pkgs.callPackage ./packages/kontor { };
+  kontor-rs = pkgs.callPackage ./packages/kontor { };
+  kontor-py = pkgs.callPackage ./packages/kontor-py { };
 
   # The user environment.
   user-env = pkgs.buildEnv {
@@ -17,7 +18,7 @@ let
         shellcheck
         shfmt
       ])
-      ++ [ kontor ];
+      ++ [ kontor-rs ];
   };
 
   # The Nix channels.
@@ -35,7 +36,8 @@ in
 {
   inherit
     pkgs
-    kontor
+    kontor-rs
+    kontor-py
     user-env
     channels
     config

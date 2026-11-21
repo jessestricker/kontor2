@@ -8,6 +8,9 @@ pkgs.mkShell {
     nixd
     nixfmt
 
+    # Python
+    ruff
+
     # Rust
     clippy
     rust-analyzer
@@ -15,7 +18,8 @@ pkgs.mkShell {
   ];
 
   inputsFrom = [
-    self.kontor
+    self.kontor-rs
+    self.kontor-py
   ];
 
   # Tells rust-analyzer where to find Rust's stdlib source.

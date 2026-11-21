@@ -1,0 +1,15 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "kontor"
+version = "0.0.0"
+requires-python = ">=3.14"
+scripts.kontor = "kontor.cli:cli"
+dependencies = ["click>=8"]
+
+[tool.ruff.lint]
+ignore = [
+  "LOG015", # root-logger-call
+]
