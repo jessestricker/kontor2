@@ -12,9 +12,7 @@ pkgs.mkShell {
     ruff
   ];
 
-  inputsFrom = [
-    self.kontor-py
-  ];
+  inputsFrom = [ self.kontor ];
 
   # https://github.com/arrterian/nix-env-selector/issues/95
   shellHook = ''
