@@ -2,7 +2,6 @@ let
   sources = import ./npins;
   pkgs = import sources.nixpkgs { };
 
-  kontor-rs = pkgs.callPackage ./packages/kontor { };
   kontor-py = pkgs.callPackage ./packages/kontor-py { };
 
   # The Nix configuration file.
@@ -38,7 +37,6 @@ in
 {
   inherit
     pkgs
-    kontor-rs
     kontor-py
     nix-conf
     user-env
