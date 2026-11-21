@@ -5,6 +5,17 @@ let
   kontor-rs = pkgs.callPackage ./packages/kontor { };
   kontor-py = pkgs.callPackage ./packages/kontor-py { };
 
+  # The Nix configuration file.
+  nix-conf = pkgs.writeTextFile {
+    # See https://nix.dev/manual/nix/2.36/command-ref/conf-file.html.
+    name = "kontor-nix-conf";
+    text = ''
+      experimental-features = nix-command
+      nix-path = nixpkgs=${sources.nixpkgs}
+    '';
+    destination = "/etc/nix/nix.conf";
+  };
+
   # The user environment.
   user-env = pkgs.buildEnv {
     name = "kontor-user-env";
@@ -18,19 +29,10 @@ let
         shellcheck
         shfmt
       ])
-      ++ [ kontor-py ];
-  };
-
-  # The Nix channels.
-  channels = pkgs.linkFarm "kontor-channels" {
-    inherit (sources)
-      nixpkgs
-      ;
-  };
-
-  # The Kontor configuration.
-  config = pkgs.linkFarm "kontor-config" {
-    inherit user-env channels;
+      ++ [
+        kontor-py
+        nix-conf
+      ];
   };
 in
 {
@@ -38,8 +40,7 @@ in
     pkgs
     kontor-rs
     kontor-py
+    nix-conf
     user-env
-    channels
-    config
     ;
 }

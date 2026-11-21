@@ -19,8 +19,28 @@ class Kontor:
             attr="user-env",
         )
 
-        logging.info("switching user profile")
+        # ensure user profile link and nix.conf like are setup
         nix_env_switch_profile(self.profile_dir)
+        symlink(
+            link=self.home_dir / ".config" / "nix" / "nix.conf",
+            target=self.profile_dir / "etc" / "nix" / "nix.conf",
+        )
+
+
+def symlink(link: Path, target: Path) -> None:
+    """Create a symbolic link from `link` to `target`.
+
+    This function will create all parent directories of `link`.
+    """
+    link.parent.mkdir(parents=True, exist_ok=True)
+
+    try:
+        os.symlink(src=target, dst=link, target_is_directory=False)
+    except FileExistsError as err:
+        existing_link_target = link.readlink()
+        if existing_link_target != target:
+            msg = "symbolic link already exists but points to a different target"
+            raise RuntimeError(msg) from err
 
 
 def get_xdg_state_home(home_dir: Path) -> Path:
