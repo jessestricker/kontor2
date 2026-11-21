@@ -18,7 +18,7 @@ let
         shellcheck
         shfmt
       ])
-      ++ [ kontor-rs ];
+      ++ [ kontor-py ];
   };
 
   # The Nix channels.
