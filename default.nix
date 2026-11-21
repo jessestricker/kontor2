@@ -26,12 +26,18 @@ let
       nixpkgs
       ;
   };
-in
-{
-  inherit kontor pkgs;
 
   # The Kontor configuration.
   config = pkgs.linkFarm "kontor-config" {
     inherit user-env channels;
   };
+in
+{
+  inherit
+    pkgs
+    kontor
+    user-env
+    channels
+    config
+    ;
 }
