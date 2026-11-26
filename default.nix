@@ -23,6 +23,8 @@ let
     paths =
       (with pkgs; [
         git
+        gh
+        man-pages
         micro
         nixd
         nixfmt
