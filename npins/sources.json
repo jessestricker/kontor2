@@ -6,6 +6,22 @@
       "artifact": "nixexprs.tar.xz",
       "url": "https://releases.nixos.org/nixpkgs/nixpkgs-26.11pre1125786.680275f0bb6a/nixexprs.tar.xz",
       "hash": "sha256-VgkIUPnO3Hugu/YIqNH6CmUoFz1rFsswtQ8kT8c2y50="
+    },
+    "py-renameat2": {
+      "type": "GitRelease",
+      "repository": {
+        "type": "GitHub",
+        "owner": "jessestricker",
+        "repo": "py-renameat2"
+      },
+      "pre_releases": false,
+      "version_upper_bound": null,
+      "release_prefix": null,
+      "submodules": false,
+      "version": "v0.1.0",
+      "revision": "b16142a4d217c2e683ba953e2233628ab491994d",
+      "url": "https://api.github.com/repos/jessestricker/py-renameat2/tarball/refs/tags/v0.1.0",
+      "hash": "sha256-Js2HLYAMAX6rTI5dGisOeP8xjLo+STl71IdVFre//ac="
     }
   },
   "version": 8

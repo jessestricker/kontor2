@@ -2,6 +2,7 @@
   lib,
   installShellFiles,
   python314Packages,
+  renameat2,
 }:
 let
   pyprojectToml = lib.importTOML ./pyproject.toml;
@@ -18,7 +19,10 @@ python314Packages.buildPythonApplication {
 
   nativeBuildInputs = [ installShellFiles ];
   build-system = with python314Packages; [ hatchling ];
-  dependencies = with python314Packages; [ click ];
+  dependencies = with python314Packages; [
+    click
+    renameat2
+  ];
 
   postInstall = ''
     installShellCompletion --cmd kontor \

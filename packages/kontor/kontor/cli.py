@@ -1,4 +1,5 @@
 import logging
+from pathlib import Path
 from typing import Any
 
 import click
@@ -53,6 +54,14 @@ def cli() -> None:
     logging.root.addHandler(ClickLoggingHandler())
     if logging.root.level > logging.INFO:
         logging.root.setLevel(logging.INFO)
+
+
+@cli.command
+@debug_option()
+@click.argument("path", type=click.Path(path_type=Path))
+def link(path: Path) -> None:
+    """Links a file into the Kontor."""
+    Kontor().link(path)
 
 
 @cli.command

@@ -1,9 +1,10 @@
 let
   sources = import ./npins;
   pkgs = import sources.nixpkgs { };
+  renameat2 = import sources.py-renameat2 { inherit pkgs; };
 
   # The kontor CLI.
-  kontor = pkgs.callPackage ./packages/kontor { };
+  kontor = pkgs.callPackage ./packages/kontor { inherit renameat2; };
 
   # The Nix configuration file.
   nix-conf = pkgs.writeTextFile {

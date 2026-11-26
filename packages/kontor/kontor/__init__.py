@@ -2,6 +2,8 @@ import logging
 import os
 from pathlib import Path
 
+import renameat2
+
 from .nix import nix_env_set, nix_env_switch_profile
 
 
@@ -10,6 +12,15 @@ class Kontor:
         self.home_dir = get_home_dir()
         self.profile_dir = get_xdg_state_home(self.home_dir) / "kontor" / "profile"
         self.config_dir = self.home_dir / "kontor"
+        self.kontor_home_dir = self.config_dir / "home"
+
+    def link(self, home_file: Path) -> None:
+        relative_name = home_file.relative_to(self.home_dir, walk_up=False)
+        kontor_file = self.kontor_home_dir / relative_name
+
+        kontor_file.parent.mkdir(parents=True, exist_ok=True)
+        renameat2.rename(home_file, kontor_file, replace=False)
+        home_file.symlink_to(kontor_file)
 
     def switch(self) -> None:
         logging.info("building user environment")
