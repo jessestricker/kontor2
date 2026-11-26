@@ -1,0 +1,8 @@
+[alias]
+	s = status
+	a = add
+	aa = add --all
+	cm = commit --message
+[user]
+	email = git@jessestricker.de
+	name = Jesse Stricker
